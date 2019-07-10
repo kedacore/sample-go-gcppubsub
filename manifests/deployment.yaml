@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keda-pubsub-go
+  namespace: keda-pubsub-test
+spec:
+  selector:
+    matchLabels:
+      service: keda-pubsub-go
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: keda-pubsub-go
+    spec:
+      containers:
+      - image: patnaikshekhar/keda-pubsub-sample:1
+        name: consumer
+        env:
+        - name: SUBSCRIPTION_NAME
+          value: "mysubscription"
+        - name: GOOGLE_APPLICATION_CREDENTIALS_JSON
+          valueFrom:
+            secretKeyRef:
+              name: pubsub-secret
+              key: GOOGLE_APPLICATION_CREDENTIALS_JSON
+        - name: PROJECT_ID
+          valueFrom:
+            secretKeyRef:
+              name: pubsub-secret
+              key: PROJECT_ID
+          
