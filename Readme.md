@@ -5,7 +5,7 @@ This is an example of using [KEDA](https://github.com/kedacore/keda) with GCP Pu
 KEDA (Kubernetes-based Event Driven Autoscaling) allows you to auto scale your kubernetes pods based on external metrics derived from systems such as RabbitMQ, Azure Storage Queues, GCP PubSub, Azure ServiceBus, etc. It also lets your scale the number of pods to zero so that you're not consuming resources when there is no processing to be done.
 
 # Prerequisites
-You need a Kubernetes cluster with KEDA installed. The [KEDA git hub repository](https://github.com/kedacore/keda) explains how this can be done using Helm.
+You need a Kubernetes cluster with KEDA installed. The [KEDA git hub repository](https://github.com/kedacore/keda) explains how this can be done using Helm.  This sample uses KEDA 2.0.
 
 Additionally, you must be comfortable with the gcloud command line tool and should have setup a GCP account and project.
 
@@ -97,25 +97,24 @@ spec:
               name: pubsub-secret
               key: PROJECT_ID
 ```
-And this is the YAML for the scaled object
+And this is the YAML for the scaled object (KEDA 2.0)
 
 ```yaml
-apiVersion: keda.k8s.io/v1alpha1
+apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: pubsub-scaledobject
   namespace: keda-pubsub-test
-  labels:
-    deploymentName: keda-pubsub-go
 spec:
   scaleTargetRef:
-    deploymentName: keda-pubsub-go
+    name: keda-pubsub-go
   triggers:
   - type: gcp-pubsub
     metadata:
       subscriptionSize: "5"
       subscriptionName: "mysubscription" # Required 
-      credentials: GOOGLE_APPLICATION_CREDENTIALS_JSON # Required
+      credentialsFromEnv: GOOGLE_APPLICATION_CREDENTIALS_JSON # Required
+
 ```
 
 Finally, we're able to test the scaler by adding messages to the topic.
